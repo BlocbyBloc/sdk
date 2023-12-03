@@ -1,0 +1,10 @@
+{
+  "name": "sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "nimishsantosh107 <36289353+nimishsantosh107@users.noreply.github.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.2"
+  }
+}
