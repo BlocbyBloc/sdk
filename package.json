@@ -4,10 +4,7 @@
   "main": "index.js",
   "author": "nimishsantosh107 <36289353+nimishsantosh107@users.noreply.github.com>",
   "license": "MIT",
-  "scripts": {
-    "build": "tsc -p .",
-    "clean": "rm -rf ./dist/"
-  },
+  "scripts": {},
   "devDependencies": {
     "typescript": "^5.3.2"
   },
