@@ -1,7 +1,7 @@
 import { ERC20AssetFactory, ERC20AssetFactory__factory } from "./interfaces";
 import { ethers, BigNumber, BigNumberish, Signer, utils, ContractTransaction } from "ethers";
 
-export interface PropertyFactoryInterface {
+export interface AssetFactoryInterface {
     readonly address: string;
 
     initAsset: (name: string, symbol: string) => Promise<string>;
@@ -9,7 +9,7 @@ export interface PropertyFactoryInterface {
     getAssets: () => Promise<string[]>;
 }
 
-export class PropertyFactory implements PropertyFactoryInterface {
+export class AssetFactory implements AssetFactoryInterface {
     /* PRIVATE PROPERTIES */
     private readonly _signer: Signer;
     private readonly _contract: ERC20AssetFactory;
@@ -21,11 +21,11 @@ export class PropertyFactory implements PropertyFactoryInterface {
 
     /**
      * @param signer Signer to use to deploy market
-     * @param propertyFactoryAddress Address of the deployed ERC20AssetFactory contract
+     * @param assetFactoryAddress Address of the deployed ERC20AssetFactory contract
      */
-    constructor(signer: Signer, propertyFactoryAddress: string) {
+    constructor(signer: Signer, assetFactoryAddress: string) {
         this._signer = signer;
-        this._contract = ERC20AssetFactory__factory.connect(propertyFactoryAddress, signer);
+        this._contract = ERC20AssetFactory__factory.connect(assetFactoryAddress, signer);
         if (!this._contract.address) {
             throw new Error("Error connecting to ERC20AssetFactory contract.");
         }
@@ -67,5 +67,3 @@ export class PropertyFactory implements PropertyFactoryInterface {
         return assetAddresses;
     };
 }
-
-export interface PropertyInterface {}
