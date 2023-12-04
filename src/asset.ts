@@ -49,7 +49,8 @@ export class AssetFactory implements AssetFactoryInterface {
         tr.events &&
             tr.events.map((event) => {
                 if (event.event === "AssetInitialization" && event.args != undefined) {
-                    assetAddress = event.args["contractAddress"];
+                    // 0 - contractAddress, 1 - owner, 2 - symbol
+                    assetAddress = event.args[0];
                 }
             });
 
