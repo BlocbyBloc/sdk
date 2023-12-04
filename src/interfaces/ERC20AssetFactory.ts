@@ -71,11 +71,26 @@ export interface ERC20AssetFactoryInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "getAssets", data: BytesLike): Result;
 
   events: {
+    "AssetInitialization(address,address,string)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AssetInitialization"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
+
+export interface AssetInitializationEventObject {
+  contractAddress: string;
+  owner: string;
+  symbol: string;
+}
+export type AssetInitializationEvent = TypedEvent<
+  [string, string, string],
+  AssetInitializationEventObject
+>;
+
+export type AssetInitializationEventFilter =
+  TypedEventFilter<AssetInitializationEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -202,6 +217,17 @@ export interface ERC20AssetFactory extends BaseContract {
   };
 
   filters: {
+    "AssetInitialization(address,address,string)"(
+      contractAddress?: string | null,
+      owner?: string | null,
+      symbol?: string | null
+    ): AssetInitializationEventFilter;
+    AssetInitialization(
+      contractAddress?: string | null,
+      owner?: string | null,
+      symbol?: string | null
+    ): AssetInitializationEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
