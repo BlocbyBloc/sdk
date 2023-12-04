@@ -4,7 +4,7 @@ import {
     ERC20Asset__factory,
     ERC20AssetFactory__factory,
 } from "./interfaces";
-import { BigNumber, Signer, utils, ContractTransaction } from "ethers";
+import { BigNumber, Signer, ContractTransaction } from "ethers";
 
 interface AssetFactoryInterface {
     readonly address: string;
@@ -90,6 +90,10 @@ export class AssetClient implements AssetClientInterface {
         return this._contract.address;
     }
 
+    /**
+     * @param signer Signer to use to deploy market
+     * @param assetAddress Address of the deployed ERC20Asset contract
+     */
     constructor(signer: Signer, assetAddress: string) {
         this._signer = signer;
         this._contract = ERC20Asset__factory.connect(assetAddress, signer);
@@ -98,23 +102,39 @@ export class AssetClient implements AssetClientInterface {
         }
     }
 
+    /**
+     * @returns string contract name
+     */
     name = async (): Promise<string> => {
         return this._contract.name();
     };
 
+    /**
+     * @returns string contract symbol
+     */
     symbol = async (): Promise<string> => {
         return this._contract.symbol();
     };
 
+    /**
+     * @returns BigNumber balance of signer address
+     */
     balance = async (): Promise<BigNumber> => {
         const selfAddress = await this._signer.getAddress();
         return this._contract.balanceOf(selfAddress);
     };
 
+    /**
+     * @param address Target wallet address
+     * @returns BigNumber balance of target wallet address
+     */
     balanceOf = async (address: string): Promise<BigNumber> => {
         return this._contract.balanceOf(address);
     };
 
+    /**
+     * @returns BigNumber total supply of asset tokens
+     */
     totalSupply = async (): Promise<BigNumber> => {
         return this._contract.totalSupply();
     };
@@ -130,14 +150,33 @@ export class AssetAdmin extends AssetClient implements AssetAdminInterface {
     constructor(signer: Signer, assetAddress: string) {
         super(signer, assetAddress);
     }
+
+    /**
+     * Mint tokens to target address
+     * @param to Target wallet address
+     * @param amount BigNumber amount of tokens
+     * @returns Promise<ContractTransaction>
+     */
     mint = async (to: string, amount: BigNumber): Promise<ContractTransaction> => {
         return this._contract.mint(to, amount);
     };
 
+    /**
+     * Burn tokens from target address
+     * @param from Target wallet address
+     * @param amount BigNumber amount of tokens
+     * @returns Promise<ContractTransaction>
+     */
     burn = async (from: string, amount: BigNumber): Promise<ContractTransaction> => {
         return this._contract.burn(from, amount);
     };
 
+    /**
+     * Transfer tokens to target address
+     * @param address Target wallet address
+     * @param amount BigNumber amount of tokens
+     * @returns Promise<ContractTransaction>
+     */
     transferTo = async (address: string, amount: BigNumber): Promise<ContractTransaction> => {
         return this._contract.transfer(address, amount);
     };
