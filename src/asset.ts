@@ -4,10 +4,9 @@ import {
     ERC20Asset__factory,
     ERC20AssetFactory__factory,
 } from "./interfaces";
-import { ethers, BigNumber, BigNumberish, Signer, utils, ContractTransaction } from "ethers";
-import { Provider } from "@ethersproject/abstract-provider";
+import { BigNumber, Signer, utils, ContractTransaction } from "ethers";
 
-export interface AssetFactoryInterface {
+interface AssetFactoryInterface {
     readonly address: string;
     initAsset: (name: string, symbol: string) => Promise<string>;
     getAssets: () => Promise<string[]>;
@@ -72,7 +71,7 @@ export class AssetFactory implements AssetFactoryInterface {
     };
 }
 
-export interface AssetClientInterface {
+interface AssetClientInterface {
     readonly address: string;
     name: () => Promise<string>;
     symbol: () => Promise<string>;
@@ -83,8 +82,8 @@ export interface AssetClientInterface {
 
 export class AssetClient implements AssetClientInterface {
     /* PRIVATE PROPERTIES */
-    private readonly _signer: Signer;
-    private readonly _contract: ERC20Asset;
+    protected readonly _signer: Signer;
+    protected readonly _contract: ERC20Asset;
 
     /* PUBLIC PROPERTIES */
     get address() {
@@ -118,5 +117,28 @@ export class AssetClient implements AssetClientInterface {
 
     totalSupply = async (): Promise<BigNumber> => {
         return this._contract.totalSupply();
+    };
+}
+
+interface AssetAdminInterface extends AssetClientInterface {
+    mint: (to: string, amount: BigNumber) => Promise<ContractTransaction>;
+    burn: (from: string, amount: BigNumber) => Promise<ContractTransaction>;
+    transferTo: (address: string, amount: BigNumber) => Promise<ContractTransaction>;
+}
+
+export class AssetAdmin extends AssetClient implements AssetAdminInterface {
+    constructor(signer: Signer, assetAddress: string) {
+        super(signer, assetAddress);
+    }
+    mint = async (to: string, amount: BigNumber): Promise<ContractTransaction> => {
+        return this._contract.mint(to, amount);
+    };
+
+    burn = async (from: string, amount: BigNumber): Promise<ContractTransaction> => {
+        return this._contract.burn(from, amount);
+    };
+
+    transferTo = async (address: string, amount: BigNumber): Promise<ContractTransaction> => {
+        return this._contract.transfer(address, amount);
     };
 }
