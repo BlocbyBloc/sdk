@@ -1,11 +1,15 @@
-import { ERC20AssetFactory, ERC20AssetFactory__factory } from "./interfaces";
+import {
+    ERC20Asset,
+    ERC20AssetFactory,
+    ERC20Asset__factory,
+    ERC20AssetFactory__factory,
+} from "./interfaces";
 import { ethers, BigNumber, BigNumberish, Signer, utils, ContractTransaction } from "ethers";
+import { Provider } from "@ethersproject/abstract-provider";
 
 export interface AssetFactoryInterface {
     readonly address: string;
-
     initAsset: (name: string, symbol: string) => Promise<string>;
-
     getAssets: () => Promise<string[]>;
 }
 
@@ -65,5 +69,54 @@ export class AssetFactory implements AssetFactoryInterface {
     getAssets = async (): Promise<string[]> => {
         const assetAddresses = await this._contract.getAssets();
         return assetAddresses;
+    };
+}
+
+export interface AssetClientInterface {
+    readonly address: string;
+    name: () => Promise<string>;
+    symbol: () => Promise<string>;
+    balance: () => Promise<BigNumber>;
+    balanceOf: (address: string) => Promise<BigNumber>;
+    totalSupply: () => Promise<BigNumber>;
+}
+
+export class AssetClient implements AssetClientInterface {
+    /* PRIVATE PROPERTIES */
+    private readonly _signer: Signer;
+    private readonly _contract: ERC20Asset;
+
+    /* PUBLIC PROPERTIES */
+    get address() {
+        return this._contract.address;
+    }
+
+    constructor(signer: Signer, assetAddress: string) {
+        this._signer = signer;
+        this._contract = ERC20Asset__factory.connect(assetAddress, signer);
+        if (!this._contract.address) {
+            throw new Error("Error connecting to ERC20Asset contract.");
+        }
+    }
+
+    name = async (): Promise<string> => {
+        return this._contract.name();
+    };
+
+    symbol = async (): Promise<string> => {
+        return this._contract.symbol();
+    };
+
+    balance = async (): Promise<BigNumber> => {
+        const selfAddress = await this._signer.getAddress();
+        return this._contract.balanceOf(selfAddress);
+    };
+
+    balanceOf = async (address: string): Promise<BigNumber> => {
+        return this._contract.balanceOf(address);
+    };
+
+    totalSupply = async (): Promise<BigNumber> => {
+        return this._contract.totalSupply();
     };
 }
