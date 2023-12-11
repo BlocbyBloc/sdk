@@ -5,6 +5,7 @@ import {
     ERC20AssetFactory__factory,
 } from "./interfaces";
 import { BigNumber, Signer, ContractTransaction } from "ethers";
+import { Provider } from "@ethersproject/providers";
 
 interface AssetFactoryInterface {
     readonly address: string;
@@ -76,14 +77,13 @@ interface AssetClientInterface {
     readonly address: string;
     name: () => Promise<string>;
     symbol: () => Promise<string>;
-    balance: () => Promise<BigNumber>;
     balanceOf: (address: string) => Promise<BigNumber>;
     totalSupply: () => Promise<BigNumber>;
 }
 
 export class AssetClient implements AssetClientInterface {
     /* PRIVATE PROPERTIES */
-    protected readonly _signer: Signer;
+    protected readonly _signerOrProvider: Signer | Provider;
     protected readonly _contract: ERC20Asset;
 
     /* PUBLIC PROPERTIES */
@@ -92,12 +92,12 @@ export class AssetClient implements AssetClientInterface {
     }
 
     /**
-     * @param signer Signer to use to deploy market
+     * @param signerOrProvider Signer or Provider of client wallet
      * @param assetAddress Address of the deployed ERC20Asset contract
      */
-    constructor(signer: Signer, assetAddress: string) {
-        this._signer = signer;
-        this._contract = ERC20Asset__factory.connect(assetAddress, signer);
+    constructor(signerOrProvider: Signer | Provider, assetAddress: string) {
+        this._signerOrProvider = signerOrProvider;
+        this._contract = ERC20Asset__factory.connect(assetAddress, signerOrProvider);
         if (!this._contract.address) {
             throw new Error("Error connecting to ERC20Asset contract.");
         }
@@ -115,14 +115,6 @@ export class AssetClient implements AssetClientInterface {
      */
     symbol = async (): Promise<string> => {
         return this._contract.symbol();
-    };
-
-    /**
-     * @returns BigNumber balance of signer address
-     */
-    balance = async (): Promise<BigNumber> => {
-        const selfAddress = await this._signer.getAddress();
-        return this._contract.balanceOf(selfAddress);
     };
 
     /**
