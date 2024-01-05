@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {
     ERC20Asset,
     ERC20AssetFactory,
@@ -184,7 +185,8 @@ export class AssetAdmin extends AssetClient implements AssetAdminInterface {
         const events = await this._contract.queryFilter(
             this._contract.filters["Transfer(address,address,uint256)"](adminAddress)
         );
-        const holders = events.map((e) => e.args.to);
+        const toAddresses = events.map((e) => e.args.to);
+        const holders = _.uniq(toAddresses);
         return holders;
     };
 }
