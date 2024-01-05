@@ -174,7 +174,12 @@ export class AssetAdmin extends AssetClient implements AssetAdminInterface {
         return this._contract.transfer(address, amount);
     };
 
+    /**
+     * Returns all holders of a particular asset
+     * @returns Promise<string[]>
+     */
     getHolders = async (): Promise<string[]> => {
+        // adminAddress is from address
         const adminAddress = await (this._signerOrProvider as Signer).getAddress();
         const events = await this._contract.queryFilter(
             this._contract.filters["Transfer(address,address,uint256)"](adminAddress)
