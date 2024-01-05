@@ -173,4 +173,12 @@ export class AssetAdmin extends AssetClient implements AssetAdminInterface {
     transferTo = async (address: string, amount: BigNumber): Promise<ContractTransaction> => {
         return this._contract.transfer(address, amount);
     };
+
+    getHolders = async (fromAddress: string): Promise<string[]> => {
+        const events = await this._contract.queryFilter(
+            this._contract.filters["Transfer(address,address,uint256)"](fromAddress)
+        );
+        const holders = events.map((e) => e.args.to);
+        return holders;
+    };
 }
